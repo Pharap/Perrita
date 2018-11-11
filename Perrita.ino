@@ -4,7 +4,7 @@
 
 #include <Arduboy2.h>
 #include <EEPROM.h>
-Arduboy2 arduboy;
+Arduboy2Base arduboy;
 BeepPin1 beep1; // class instance for speaker pin 1
 BeepPin2 beep2; // class instance for speaker pin 1
 //#include "Sprites.h"
@@ -13,14 +13,14 @@ BeepPin2 beep2; // class instance for speaker pin 1
 Font3x5 font3x5 = Font3x5();
 #include "global.h"
 #include "Graficos.h"
-#include "Varios.h";
+#include "Varios.h"
 #include "Maps.h"
 #include "Textos.h"
 #include "ObjetosMapas.h"
 #include "AranaGrande.h"
-#include "Player.h";
-#include "Niveles.h";
-#include "Menu.h";
+#include "Player.h"
+#include "Niveles.h"
+#include "Menu.h"
 
 //**************************************************************************************************
 void setup() {

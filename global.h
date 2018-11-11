@@ -1,3 +1,5 @@
+#pragma once
+
 //Estados de la perrita.
 #define cDerecha     1
 #define cIzquierda   2

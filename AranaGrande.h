@@ -1,5 +1,7 @@
+#pragma once
+
 //**************************************************************************************************
-AranaCreaAranitas()
+void AranaCreaAranitas()
 //La arana gitante ataca creando aranitas.
 {
 	byte bContador=0;
@@ -16,13 +18,13 @@ AranaCreaAranitas()
 	}
 }
 //**************************************************************************************************
-PintaAranaGrande()
+void PintaAranaGrande()
 //Pinta la arana grande
 {
 	static byte bContador1=32;
 	static byte bContador2=16;
 	byte bAranaFrame;
-	static byte bMovimiento=1; //1-Derecha/Izquierda.
+	//static byte bMovimiento=1; //1-Derecha/Izquierda.
 	static byte bSentido=0; //0-Izquierda, 1-Derecha.
 	
 	bAranaFrame=PerritaFrame;
@@ -38,10 +40,8 @@ PintaAranaGrande()
 	}
 
 	
-	SpriteMirror(iAranaGrandeX-iCamX, iAranaGrandeY-iCamY, AranaGrande, AranaGrandeMascara,
-							bAranaFrame, bAranaFrame,0,0);
-	SpriteMirror(iAranaGrandeX-iCamX+16, iAranaGrandeY-iCamY, AranaGrande, AranaGrandeMascara,
-							bAranaFrame, bAranaFrame,1,0);
+	SpriteMirror(iAranaGrandeX-iCamX, iAranaGrandeY-iCamY, AranaGrande, AranaGrandeMascara, bAranaFrame, bAranaFrame,0,0);
+	SpriteMirror(iAranaGrandeX-iCamX+16, iAranaGrandeY-iCamY, AranaGrande, AranaGrandeMascara, bAranaFrame, bAranaFrame,1,0);
 							
 	//Muere la arana.
 	if(bVidaArana==0 and aiExplosionDisparo[(cCantidadDisparos-1)*3+2]==4 and bContador1>=0 and bContador1<33){
@@ -78,14 +78,14 @@ PintaAranaGrande()
 //**************************************************************************************************
 //**************************************************************************************************
 //**************************************************************************************************
-ColisionAranaBala(int iX, int iY)
+bool ColisionAranaBala(int iX, int iY)
 //Comprueba si ha chocado con una bala.
 {
-	if(arduboy.collide((Rect){iAranaGrandeX+2,iAranaGrandeY+2,30,14},
-		(Rect){iX-2,iY-2,6,6}))if(bVidaArana>0){
-		bVidaArana--;
-		return true;
-	}
+	if(arduboy.collide((Rect){iAranaGrandeX+2,iAranaGrandeY+2,30,14}, (Rect){iX-2,iY-2,6,6}))
+		if(bVidaArana>0){
+			bVidaArana--;
+			return true;
+		}
 	return false;
 }
 //**************************************************************************************************

@@ -1,3 +1,5 @@
+#pragma once
+
 class Font3x5 : public Print {
     
   public:

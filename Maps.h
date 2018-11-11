@@ -1,3 +1,5 @@
+#pragma once
+
 //**************************************************************************************************
 #include "DatosMapas.h"
 //**************************************************************************************************
@@ -35,9 +37,8 @@ void SpriteMirror(int16_t x, int16_t y, const uint8_t* bitmap, const uint8_t* ma
 
     uint16_t frame_offset = (w * ( h / 8 + ( h % 8 == 0 ? 0 : 1)));
 
-    if (frame >= 0) {
-        mask += maskFrame * frame_offset;
-        bitmap += frame * frame_offset;
+	mask += maskFrame * frame_offset;
+	bitmap += frame * frame_offset;
         
     // xOffset technically doesn't need to be 16 bit but the math operations
     // are measurably faster if it is
@@ -154,10 +155,9 @@ void SpriteMirror(int16_t x, int16_t y, const uint8_t* bitmap, const uint8_t* ma
         ofs += WIDTH - rendered_width;
     }
 }
-}
 //**************************************************************************************************
 //**************************************************************************************************
-CalculaTile(int iTileX, int iTileY)
+uint8_t CalculaTile(int iTileX, int iTileY)
 //Devuelve el numero de tile al que pertenece las coordenadas.
 //iX e iY son coordenadas tiles.
 //Actualiza iDesplazamiento.
@@ -165,7 +165,6 @@ CalculaTile(int iTileX, int iTileY)
 	int iDesplazamiento=0;
 	int iMetaTileX=0;
 	int iMetaTileY=0;
-	byte bMetaTile=0;
 	
 	//Calcula Desplazamiento.
 	iDesplazamiento=pgm_read_byte(&aDesplazamientos[pgm_read_byte(&aDesplazamientosInit[bMapaEnCurso-1])+(iTileY/4)]);
@@ -181,16 +180,16 @@ CalculaTile(int iTileX, int iTileY)
 	}
 	iMetaTileY=iTileY/4;
 	//Calculo Metatile al que pertenece.
-	bMetaTile=pgm_read_byte(&Mapas[iMetaTileX+iMetaTileY*iAnchoMapaEnCurso/8/2/4+pgm_read_byte(&MapComienzo[bMapaEnCurso-1])]);
+	byte bMetaTile=pgm_read_byte(&Mapas[iMetaTileX+iMetaTileY*iAnchoMapaEnCurso/8/2/4+pgm_read_byte(&MapComienzo[bMapaEnCurso-1])]);
 	if(bMetaTile>127) bMetaTile-=128; //Tiene desplazamiento. Se lo quito.
-	if(bMetaTile==0) return 0; //Tile vacio.
+	if(bMetaTile==0)
+		return 0; //Tile vacio.
 	else
 		//Calculo Tile exacto dentro del metatile. Aprobecho la variable.
-		bMetaTile=pgm_read_byte(&MetaTiles[(bMetaTile-1)*16+(iTileX%4+(iTileY%4)*4)]);
-	return bMetaTile;
+		return pgm_read_byte(&MetaTiles[(bMetaTile-1)*16+(iTileX%4+(iTileY%4)*4)]);
 }
 //**************************************************************************************************
-boolean EsTileSolido(int iX, int iY)
+bool EsTileSolido(int iX, int iY)
 //Devuelve True si el tile en la coordenada x,y absoluta del mapa es solido y no se puede atravesar.
 //iX e iY son coordenadas pixeles.
 {
@@ -211,7 +210,7 @@ boolean EsTileSolido(int iX, int iY)
 }
 //**************************************************************************************************
 //**************************************************************************************************
-PlayerColision()
+bool PlayerColision()
 //Calcula si el prota choca con alguna de sus esquinas. iPerritaX, iPerritaY.
 {
 	byte bContador=0;
@@ -236,7 +235,7 @@ PlayerColision()
 	return false;
 }
 //**************************************************************************************************
-Colision8x8(int iX, int iY)
+bool Colision8x8(int iX, int iY)
 //Calcula si un objeto de 8x8 choca con algun tile solido.
 {
   if((EsTileSolido(iX+2,iY+2))or
@@ -246,7 +245,7 @@ Colision8x8(int iX, int iY)
     return false;
 }
 //**************************************************************************************************
-ColisionGeneral8x8(int iX, int iY)
+bool ColisionGeneral8x8(int iX, int iY)
 //Devuelve si en el tile iX, iY hay algun obstaculo.
 {
 	byte bContador=0;
@@ -278,7 +277,7 @@ ColisionGeneral8x8(int iX, int iY)
 //**************************************************************************************************
 //Colisiones.
 //**************************************************************************************************
-ColisionAvispas(int iX, int iY, byte bX, byte bY)
+bool ColisionAvispas(int iX, int iY, byte bX, byte bY)
 //Comprueba si se ha colisionado con alguna avispa.
 //iX, iY: Coordenadas de inicio.
 //bX, bY: Tamaño del cuadrado.
@@ -293,7 +292,7 @@ ColisionAvispas(int iX, int iY, byte bX, byte bY)
 	return false;
 }
 //**************************************************************************************************
-ColisionAvisperos(int iX, int iY, byte bX, byte bY)
+bool ColisionAvisperos(int iX, int iY, byte bX, byte bY)
 //Comprueba si se ha colisionado con algun avispero.
 //iX, iY: Coordenadas de inicio.
 //bX, bY: Tamaño del cuadrado.

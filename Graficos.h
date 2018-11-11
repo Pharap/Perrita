@@ -1,3 +1,5 @@
+#pragma once
+
 //MENU INFORMATIVO CORAZON HUESO LLAVE
 //**************************************************************************************************
 const unsigned char PROGMEM CorazonHueso[] = //Comprimido

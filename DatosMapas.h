@@ -1,3 +1,5 @@
+#pragma once
+
 //**************************************************************************************************
 //Datos de los mapas.
 const unsigned char PROGMEM MetaTiles[] = {

@@ -1,3 +1,5 @@
+#pragma once
+
 //**************************************************************************************************
 //Los caracteres originales de la ArduBoy son de 5x7.
 const char PROGMEM TextoLenguaje00[]="  START  ";
@@ -17,15 +19,13 @@ TextoLenguaje12,
 };
 
 //**************************************************************************************************
-Menu()
+void Menu()
 //Presenta un menu y gestiona las opciones.
 {
 	static byte bFlecha=1; //Indica meneo y parpadeo de flecha.
 	static byte bContador=1;
 	static byte bMenu=1; //1-INICIO, 2-LENGAJE, 3-SONIDO.
 	static byte bSiguienteMenu=1;
-	byte bContador2=0;    //Local
-	char cTextBuffer[20]; //Local
 
 //		arduboy.audio.off();
 		bSonido=0; //Detiene el sonido.
@@ -60,9 +60,11 @@ Menu()
 			arduboy.fillRect(83-10,54,35,9,BLACK);
 			font3x5.setCursor(-10+90+30-bContador,55);
 			//Copia cadena que voy a imprimir
-			for(bContador2=0;bContador2<3;bContador2++){
-				strcpy_P(cTextBuffer,(char*)pgm_read_word(&(TextoLenguajeTabla[bIdioma*3+bContador2])));
+			char cTextBuffer[20]; //Local
+			for(byte bContador2=0;bContador2<3;bContador2++){
+				strcpy_P(cTextBuffer,(char*)pgm_read_ptr(&TextoLenguajeTabla[bIdioma*3+bContador2]));
 				font3x5.print(cTextBuffer);
+				//font3x5.print(AsFlashString(pgm_read_ptr(&TextoLenguajeTabla[bIdioma*3+bContador2])));
 			}
 			//Borro area.
 			arduboy.fillRect(119-10,50,127,64,BLACK);
@@ -72,10 +74,10 @@ Menu()
 			//Dibujo flechas.
 			if(arduboy.everyXFrames(5))bFlecha++;
 			if(bMenu==2 or bMenu==3){
-				SpriteMirror(-10+74-bFlecha%4,55,Objetos8x8,Objetos8x8,cFlechaMenu,cFlechaMenu,1,0); //Flecha izquierda.
+				SpriteMirror(-10 + 74 - bFlecha % 4, 55, Objetos8x8, Objetos8x8, cFlechaMenu, cFlechaMenu, 1, false); //Flecha izquierda.
 			}
 			if(bMenu==1 or bMenu==2){
-				SpriteMirror(-10+119+bFlecha%4,55,Objetos8x8,NULL,cFlechaMenu,NULL,0,0); //Flecha derecha.
+				SpriteMirror(-10 + 119 + bFlecha %4, 55, Objetos8x8, NULL, cFlechaMenu, 0, 0, false); //Flecha derecha.
 			}
 			//Muevo los menus
 			if(bContador<35)bContador+=2;  //Deslizo el primer cartel.

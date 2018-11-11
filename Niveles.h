@@ -1,5 +1,7 @@
+#pragma once
+
 //**************************************************************************************************
-InicializaNivel()
+void InicializaNivel()
 {
 	byte bContador=0;
 
@@ -69,7 +71,7 @@ InicializaNivel()
     }
 }
 //**************************************************************************************************
-Nivel()
+void Nivel()
 //Ejecuta el nivel 1.
 {
 	static byte bFallaste=1;

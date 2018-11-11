@@ -1,41 +1,52 @@
+#pragma once
+
 //Mapa Jardin.
 //------------
 //Puerta Tile 28,0 .Se abre con la llave.
 //**************************************************************************************************
-ColisionPajaro(byte bContador)
+bool ColisionPajaro(byte bContador)
 //Comprueba que el pajaro no choca con nada.
 //bContador indica el numero de pajaro.
 {
 
-	int iDestinoX=0; //Variables para optimizar
-	int iDestinoY=0;
-	
-	iDestinoX=abPajaros[bContador*2+cPajaroDestinoX]*8;
-	iDestinoY=abPajaros[bContador*2+cPajaroDestinoY]*8;
+	//Variables para optimizar	
+	int iDestinoX = (abPajaros[(bContador * 2) + cPajaroDestinoX] * 8);
+	int iDestinoY = (abPajaros[(bContador * 2) + cPajaroDestinoY] * 8);		
+	Rect destinoRect = { iDestinoX, iDestinoY, 8, 8 };
 
 	//Choque con un tile solido.
-	if(Colision8x8(iDestinoX,iDestinoY)) return true;
+	if(Colision8x8(destinoRect.x, destinoRect.y))
+		return true;
+		
 	// Choque con avispas.
-	if(ColisionAvispas(iDestinoX,iDestinoY,8,8)) return true;
+	if(ColisionAvispas(destinoRect.x, destinoRect.y, destinoRect.width, destinoRect.height))
+		return true;
+		
 	//Choque con avisperos
-	if(ColisionAvisperos(iDestinoX,iDestinoY,8,8)) return true;
+	if(ColisionAvisperos(destinoRect.x, destinoRect.y, destinoRect.width, destinoRect.height))
+		return true;
+		
 	//Choque con perrita.
-	if(arduboy.collide((Rect){iPerritaX,iPerritaY,16,16},
-		(Rect){iDestinoX,iDestinoY,8,8})) return true;
+	if(arduboy.collide((Rect){iPerritaX, iPerritaY, 16, 16}, destinoRect))
+		return true;
+		
 	//Choque con Arboles.
-	if(arduboy.collide((Rect){cArbol1X*8,cArbol1Y*8,16,16},
-		(Rect){iDestinoX,iDestinoY,8,8})) return true;
-	if(arduboy.collide((Rect){cArbol2X*8,cArbol2Y*8,16,16},
-		(Rect){iDestinoX,iDestinoY,8,8})) return true;
-	if(arduboy.collide((Rect){cArbol3X*8,cArbol3Y*8,16,16},
-		(Rect){iDestinoX,iDestinoY,8,8})) return true;
+	if(arduboy.collide((Rect){cArbol1X * 8, cArbol1Y * 8, 16, 16}, destinoRect))
+		return true;
+		
+	if(arduboy.collide((Rect){cArbol2X * 8, cArbol2Y * 8, 16, 16}, destinoRect))
+		return true;
+		
+	if(arduboy.collide((Rect){cArbol3X * 8, cArbol3Y * 8, 16, 16}, destinoRect))
+		return true;
+		
 	return false;
 	
 }
 //**************************************************************************************************
 //**************************************************************************************************
 //**************************************************************************************************
-PintaTile16x16(byte bTile16X16, int iX, int iY)
+void PintaTile16x16(byte bTile16X16, int iX, int iY)
 //Pinta un Tile de 16x16 formado por 4 tiles de 8x8.
 //bTile - Numero de tile.
 //iX    - Coordenada absoluta del mapa.
@@ -52,11 +63,11 @@ PintaTile16x16(byte bTile16X16, int iX, int iY)
 			bEspejo=1;}
 		else bEspejo=0;
 			SpriteMirror(iX*8-iCamX+((bContador-bTile16X16*4)/2)*8,iY*8-iCamY+((bContador-bTile16X16*4)%2)*8
-				,Tiles,NULL,bTile,NULL,bEspejo,0);
+				,Tiles,NULL,bTile,0,bEspejo,false);
 	}
 }
 //**************************************************************************************************
-PintaCabezaLlave()
+void PintaCabezaLlave()
 //Dibuja la cabeza donde se esconde la llave.
 {
 	if(bEnemigos or bLlaves)
@@ -73,7 +84,7 @@ PintaCabezaLlave()
 	}
 }
 //**************************************************************************************************
-ProcesoGenerico()
+void ProcesoGenerico()
 {
 //*******PINTA PANTALLA
 //Pinta la pantalla correspondiente al inicio de coordenadas iCamX, iCamY.
@@ -122,8 +133,7 @@ ProcesoGenerico()
 				)
 				bEspejo=0;
 			else bEspejo=1;
-			SpriteMirror(iContadorX*8-iCamX,iContadorY*8-iCamY,
-			Tiles,NULL,bTile,NULL,bEspejo,0);
+			SpriteMirror((iContadorX * 8) - iCamX, (iContadorY * 8) - iCamY, Tiles, NULL, bTile, 0, bEspejo, false);
 			}
 		}
 //*******PINTA CARTEL
@@ -187,7 +197,7 @@ ProcesoGenerico()
     bDatoY=pgm_read_byte(&aMonton[bContador*3+1]);
     if (bitRead(MontonesBit,bContador-((bMapaEnCurso-1)*16))and
       (((iCamX-8<bDatoX*8) and (iCamX+8+cAnchoPantalla>bDatoX*8)) or ((iCamY-8<bDatoY*8) and (iCamY+8+cAltoPantalla>bDatoY*8)))){
-        SpriteMirror(bDatoX*8-iCamX,bDatoY*8-iCamY,Objetos8x8,NULL,cMonton,NULL,0,0);
+        SpriteMirror(bDatoX*8-iCamX,bDatoY*8-iCamY,Objetos8x8,NULL,cMonton,0,0,false);
 		//Compruebo si estan escarvando
       if(bitRead(MontonesBit,bContador-((bMapaEnCurso-1)*16))and((arduboy.collide((Rect){iPerritaX-iCamX,iPerritaY-iCamY,16,16},
 											(Rect){bDatoX*8-iCamX,bDatoY*8-iCamY,8,8}))and
@@ -212,7 +222,7 @@ ProcesoGenerico()
     bDatoY=pgm_read_byte(&aMontonesLlaves[bContador*2+1]);
     if (bitRead(MontonesLlaveBit,bContador)and
       (((iCamX-8<bDatoX*8) and (iCamX+8+cAnchoPantalla>bDatoX*8)) or ((iCamY-8<bDatoY*8) and (iCamY+8+cAltoPantalla>bDatoY*8)))){
-        SpriteMirror(bDatoX*8-iCamX,bDatoY*8-iCamY,Objetos8x8,NULL,cMonton,NULL,0,0);
+        SpriteMirror(bDatoX*8-iCamX,bDatoY*8-iCamY,Objetos8x8,NULL,cMonton,0,0,false);
 		//Compruebo si estan escarvando
       if(bitRead(MontonesLlaveBit,bContador)and((arduboy.collide((Rect){iPerritaX-iCamX,iPerritaY-iCamY,16,16},
 											(Rect){bDatoX*8-iCamX,bDatoY*8-iCamY,8,8}))and
@@ -243,7 +253,7 @@ ProcesoGenerico()
 				bFrame=cAvispero;
 			else
 				bFrame=cTelarana;
-			SpriteMirror(bDatoX*8-iCamX,bDatoY*8-iCamY,Objetos8x8,NULL,bFrame,NULL,0,0);
+			SpriteMirror(bDatoX*8-iCamX,bDatoY*8-iCamY,Objetos8x8,NULL,bFrame,0,0,false);
 			}
 		}
 	}
@@ -303,12 +313,11 @@ ProcesoGenerico()
 						bFrame=cAvispa2;
 						bMascara=7;
 					}
-					SpriteMirror(iDatoX-iCamX, iDatoY-iCamY, Objetos8x8, Mascaras8x8,
-											bFrame, bMascara,0,0);
+					SpriteMirror(iDatoX-iCamX, iDatoY-iCamY, Objetos8x8, Mascaras8x8, bFrame, bMascara, 0, false);
 					}
 				else
 				if(bMapaEnCurso==2)
-					SpriteMirror(iDatoX-iCamX, iDatoY-iCamY, Objetos8x8,NULL,cArana1+PerritaFrame,NULL,0,0);
+					SpriteMirror(iDatoX-iCamX, iDatoY-iCamY, Objetos8x8, NULL, cArana1+PerritaFrame, 0, 0, false);
 			}
         }
     }
@@ -363,7 +372,7 @@ ProcesoGenerico()
 				}
 			}
 			SpriteMirror( aiPajaros[bContador*2+cPajaroX]-iCamX, aiPajaros[bContador*2+cPajaroY]-iCamY,Objetos8x8,Mascaras8x8,
-									  cPajaro1+PerritaFrame,cMascaraPajaro1+PerritaFrame,bitRead(PajarosBit,bContador),0);
+									  cPajaro1+PerritaFrame,cMascaraPajaro1+PerritaFrame,bitRead(PajarosBit,bContador), false);
 			bFrame=random(1,40);  //Unas veces pica para un lado, otras para el otro. Si el random no coincide, no cambio de posicion.
 			switch(bFrame){
 				case 2:
@@ -375,7 +384,7 @@ ProcesoGenerico()
 			}
 		}
 		else SpriteMirror( aiPajaros[bContador*2+cPajaroX]-iCamX, aiPajaros[bContador*2+cPajaroY]-iCamY,Objetos8x8,Mascaras8x8,
-									   cPajaroVolando1+PerritaFrame,cMascaraPajaroVolando1+PerritaFrame,0,0);
+									   cPajaroVolando1+PerritaFrame,cMascaraPajaroVolando1+PerritaFrame,0,false);
 
 			if(aiPajaros[bContador*2+cPajaroX]<abPajaros[bContador*2+cPajaroDestinoX]*8)aiPajaros[bContador*2+cPajaroX]++;
 			if(aiPajaros[bContador*2+cPajaroX]>abPajaros[bContador*2+cPajaroDestinoX]*8)aiPajaros[bContador*2+cPajaroX]--;
@@ -402,7 +411,7 @@ ProcesoGenerico()
 //**************************************************************************************************
 //**************************************************************************************************
 //**************************************************************************************************
-InicializaAvispas()
+void InicializaAvispas()
 //Crea todas las avispas.
 //Cada 3 avispas pertenecen a un avispero. Hay que tenerlo en cuenta a la hora de crearlas.
 {
@@ -427,7 +436,7 @@ InicializaAvispas()
 }
 //**************************************************************************************************
 //**************************************************************************************************
-ColisionAvispaBala(int iX, int iY)
+bool ColisionAvispaBala(int iX, int iY)
 //Comprueba si alguna avispa ha sido alcanzada por una bala en las coordenadas iX, iY.
 //Mata la avispa y devuelve true.
 {

@@ -1,3 +1,5 @@
+#pragma once
+
 //**************************************************************************************************
 /* TEXTOS
 
@@ -59,22 +61,10 @@ TextoPresionaA0,TextoPresionaA1};
 
 
 //**************************************************************************************************
-MuestraTexto2Lineas(byte bLinea)
+void MuestraTexto2Lineas(byte bLinea)
 //Muestra un texto de 2 lineas con un recuadro y espera a que se pulse A.
 //bLinea==Contiene la linea a mostrar.
 {
-	char  cTextBuffer[35];
-	byte bContador=0;
-	byte bContador2=8;
-	byte bMariposaY=15;
-	byte bMariposaSentido=0; //1-Sube. 2-Baja.
-	byte bFrame=0;
-	byte bPajaroVolando=0;  //1-Volando. 0-Parado.
-	
-	
-	
-	String sBuffer=""; //Variable para poder medir la longitud.
-
 	arduboy.waitNoButtons();
 
 	//Dibujo marco de la ventana.
@@ -83,19 +73,23 @@ MuestraTexto2Lineas(byte bLinea)
 	//Copio cadena a cTextBuffer.
 	//bIdioma==0 a 3
 	//1a linea.
+	byte bMariposaSentido=0; //1-Sube. 2-Baja.
 	if(bLinea==4){ //Animacion final
 		arduboy.clear();
 		bMariposaSentido=10;
 	}
 	
-	for(bContador=0;bContador<2;bContador++){
-		strcpy_P(cTextBuffer,(char*)pgm_read_word(&(Texto2LineasTabla[((bLinea-1)*4)+bContador+(bIdioma*2)])));
-		sBuffer=cTextBuffer;
+	for(byte bContador=0;bContador<2;bContador++){
 		
-		font3x5.setCursor((128-sBuffer.length()*4)/2,20-bMariposaSentido+bContador*14);
-		font3x5.println(sBuffer);
+		const char * ptr = reinterpret_cast<const char *>(pgm_read_ptr(&Texto2LineasTabla[((bLinea - 1) * 4) + bContador + (bIdioma * 2)]));
+		size_t len = strlen_P(ptr);
+		font3x5.setCursor((128 - len * 4) / 2, 20 - bMariposaSentido + bContador * 14);
+		font3x5.println(AsFlashString(ptr));
 	}
 
+	byte bMariposaY=15;
+	byte bContador2=8;
+	byte bPajaroVolando=0;  //1-Volando. 0-Parado.
 	if(bLinea==4){ //Animacion final
 		//Inicializa el pajaro.
 		aiPajaros[0]=-10;
@@ -104,15 +98,15 @@ MuestraTexto2Lineas(byte bLinea)
 			//Cuadrado blanco.
 			arduboy.fillRect(0,36,128,28,WHITE); 
 			//Hierba
-			for(bContador=0;bContador<19;bContador++){
-				SpriteMirror(bContador*8+bContador2-24,64-8,Tiles,NULL,26+bContador%3,NULL,0,0);
+			for(byte bContador=0;bContador<19;bContador++){
+				SpriteMirror(bContador*8+bContador2-24,64-8,Tiles,NULL,26+bContador%3,0,0,false);
 			}
 			if(bContador2<1)bContador2=24;
 			if(arduboy.everyXFrames(2)){
 				bContador2--;
 			}
 			//Perrita
-			SpriteMirror(4,64-24+8, Perrita,PerritaMascaras,PerritaFrame,PerritaFrame,1,0);
+			SpriteMirror(4,64-24+8, Perrita,PerritaMascaras,PerritaFrame,PerritaFrame,1,false);
 			if(arduboy.everyXFrames(15)){
 			  if(PerritaFrame==1){
 				PerritaFrame=0;
@@ -122,7 +116,7 @@ MuestraTexto2Lineas(byte bLinea)
 			  }
 			}
 			//Mariposa.
-			SpriteMirror(4+25,64-38+bMariposaY+8, Objetos8x8,NULL,19+PerritaFrame,NULL,0,0);
+			SpriteMirror(4+25,64-38+bMariposaY+8, Objetos8x8,NULL,19+PerritaFrame,0,0,false);
 			if(arduboy.everyXFrames(10))
 			if(bMariposaSentido)bMariposaY++;
 			else bMariposaY--;
@@ -139,8 +133,8 @@ MuestraTexto2Lineas(byte bLinea)
 				if(arduboy.everyXFrames(2))aiPajaros[cPajaroX]--;
 				
 				SpriteMirror( aiPajaros[cPajaroX], aiPajaros[cPajaroY],Objetos8x8,Mascaras8x8,
-										  cPajaro1+PerritaFrame,cMascaraPajaro1+PerritaFrame,bitRead(PajarosBit,0),0);
-				bFrame=random(1,40);  //Unas veces pica para un lado, otras para el otro. Si el random no coincide, no cambio de posicion.
+										  cPajaro1+PerritaFrame,cMascaraPajaro1+PerritaFrame,bitRead(PajarosBit,0),false);
+				byte bFrame=random(1,40);  //Unas veces pica para un lado, otras para el otro. Si el random no coincide, no cambio de posicion.
 				switch(bFrame){
 					case 2:
 						bitSet(PajarosBit,0);
@@ -152,7 +146,7 @@ MuestraTexto2Lineas(byte bLinea)
 			}
 			else{
 				SpriteMirror( aiPajaros[cPajaroX], aiPajaros[cPajaroY],Objetos8x8,Mascaras8x8,
-										   cPajaroVolando1+PerritaFrame,cMascaraPajaroVolando1+PerritaFrame,0,0);
+										   cPajaroVolando1+PerritaFrame,cMascaraPajaroVolando1+PerritaFrame,0,false);
 
 				if(aiPajaros[cPajaroX]<abPajaros[cPajaroDestinoX])aiPajaros[cPajaroX]++;
 				if(aiPajaros[cPajaroX]>abPajaros[cPajaroDestinoX])aiPajaros[cPajaroX]--;
@@ -173,14 +167,16 @@ MuestraTexto2Lineas(byte bLinea)
 
 }
 //**************************************************************************************************
-TextoPresionaA()
+void TextoPresionaA()
 //Muestra un mensaje enpantalla pidiendo que se presione A
 {
-	char cTextBuffer[20];
+	const auto n = (12 * 4);
+	const auto x = ((128 - n) / 2);
+	const auto y = (29 - 10);
 	
-	strcpy_P(cTextBuffer,(char*)pgm_read_word(&(TextoPresionaATabla[bIdioma])));
-	arduboy.fillRect((128-12*4)/2,29-10,12*4,9,BLACK);
-	font3x5.setCursor((128-12*4)/2,30-10);
-	font3x5.print(cTextBuffer);
+	arduboy.fillRect(x, y, n, 9, BLACK);
+	font3x5.setCursor(x, y + 1);
+	
+	font3x5.print(AsFlashString(pgm_read_ptr(&TextoPresionaATabla[bIdioma])));
 }
 //**************************************************************************************************
